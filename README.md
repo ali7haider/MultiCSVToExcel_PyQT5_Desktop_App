@@ -61,4 +61,3 @@ This project is licensed under the **MIT License**. See the [LICENSE](https://op
 
 ---
 
-This format should be more readable and properly formatted for GitHub.
