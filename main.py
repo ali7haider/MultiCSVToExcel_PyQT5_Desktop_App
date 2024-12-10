@@ -46,8 +46,8 @@ class PhoneNumberExtractor(QMainWindow, Ui_MainWindow):
         self.file_list_display.clear()  # Clear previous logs in the display
         for file in self.selected_files:
             try:
-                # Load CSV file into a DataFrame
-                df = pd.read_csv(file)
+                # Load CSV file into a DataFrame with string data type
+                df = pd.read_csv(file, dtype=str)
 
                 # Check if either "Telefono" or "Telefono (consigliato)" exists
                 telefono_column = None
@@ -57,9 +57,14 @@ class PhoneNumberExtractor(QMainWindow, Ui_MainWindow):
                     telefono_column = "Telefono (consigliato)"
 
                 if telefono_column:
-                    # Extract phone numbers and append to the list
-                    phone_numbers = df[telefono_column].dropna()
-                    extracted_numbers.extend(phone_numbers)
+                    # Extract phone numbers and clean data
+                    phone_numbers = df[telefono_column].dropna().str.strip()
+                    phone_numbers = phone_numbers.str.replace(r'[^\+\d]', '', regex=True)
+
+                    # Filter valid numbers
+                    valid_numbers = [num for num in phone_numbers if num.startswith('+') and num[1:].isdigit()]
+                    extracted_numbers.extend(valid_numbers)
+
                     self.file_list_display.append(f"<span style='color:green;'>Processed: {os.path.basename(file)}</span>")
                 else:
                     raise ValueError(
